@@ -1,0 +1,25 @@
+#!/bin/bash
+set -euo pipefail
+hash sed
+hash gtf
+hash xrandr
+
+if test $# -ne 4; then
+	echo "Usage:"
+	echo "$0 monitor width height Hz"
+	echo
+	echo "Ex:"
+	echo "$0 HDMI-0 1920 1080 59.94"
+	echo
+	xrandr --listmonitors 2>/dev/null | while read -r a b c d; do
+		test "$d" == '' && echo "$b $a" || echo "$d $c"
+	done
+	exit 1
+fi
+monitor="$1"
+shift
+
+read -ra gtf < <(gtf "$@" | sed -rn 's/Modeline\s*"(.*)"\s*(.*)$/\1 \2/p') || true
+xrandr --newmode "${gtf[@]}" 2>/dev/null || true
+xrandr --addmode "$monitor" "${gtf[0]}"
+xrandr --output "$monitor" --mode "${gtf[0]}"
