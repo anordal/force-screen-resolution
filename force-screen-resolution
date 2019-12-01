@@ -11,15 +11,47 @@ require() {
 }
 
 require sed
-require gtf
 require xrandr
+
+mcmd=(cvt -r)
+
+opt=true
+case $1 in
+	--timing=GTF)
+		mcmd=(gtf)
+	;;
+	--timing=CVT)
+		mcmd=(cvt)
+	;;
+	--timing=CVT-RB)
+		mcmd=(cvt -r)
+	;;
+	--timing=*)
+		die "$1: Alternatives are GTF, CVT, CVT-RB"
+	;;
+	*)
+		opt=false
+	;;
+esac
+if "$opt"; then
+	shift
+fi
+
+require "${mcmd[0]}"
 
 if test $# -ne 4; then
 	echo "Usage:"
-	echo "$0 monitor width height Hz"
+	echo "$0 [options] monitor width height Hz"
 	echo
 	echo "Ex:"
-	echo "$0 HDMI-0 1920 1080 59.94"
+	echo "$0 HDMI-0 1920 1080 60"
+	echo
+	echo "Options:"
+	echo "--timing=GTF|CVT|CVT-RB  Choose timing scheme. Influences the pixel clock."
+	echo "    GTF = Generalized Timing Formula, see man 1 gtf"
+	echo "    CVT = Coordinated Video Timing, see man 1 cvt"
+	echo "    CVT-RB = CVT with reduced blanking (too little for CRT screens)."
+	echo "    default: CVT-RB"
 	echo
 	xrandr --listmonitors 2>/dev/null | while read -r a b c d; do
 		test "$d" == '' && echo "$b $a" || echo "$d $c"
@@ -29,7 +61,7 @@ fi
 monitor="$1"
 shift
 
-read -ra gtf < <(gtf "$@" | sed -rn 's/Modeline\s*"(.*)"\s*(.*)$/\1 \2/p') || true
-xrandr --newmode "${gtf[@]}" 2>/dev/null || true
-xrandr --addmode "$monitor" "${gtf[0]}"
-xrandr --output "$monitor" --mode "${gtf[0]}"
+read -ra mode < <("${mcmd[@]}" "$@" | sed -rn 's/Modeline\s*"(.*)"\s*(.*)$/\1 \2/p') || true
+xrandr --newmode "${mode[@]}" 2>/dev/null || true
+xrandr --addmode "$monitor" "${mode[0]}"
+xrandr --output "$monitor" --mode "${mode[0]}"
