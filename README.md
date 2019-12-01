@@ -18,7 +18,7 @@ When your screen is stuck at 1024×768 because EDID is broken, and you just want
         CVT-RB = CVT with reduced blanking (too little for CRT screens).
         default: CVT-RB
 
-    2 Monitors:
+    You have 2 Monitors:
     LVDS 1600/382x900/214+0+0
     HDMI-0 1920/508x1080/286+1600+0
 

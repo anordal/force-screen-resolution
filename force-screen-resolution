@@ -53,6 +53,7 @@ if test $# -ne 4; then
 	echo "    CVT-RB = CVT with reduced blanking (too little for CRT screens)."
 	echo "    default: CVT-RB"
 	echo
+	printf "You have "
 	xrandr --listmonitors 2>/dev/null | while read -r a b c d; do
 		test "$d" == '' && echo "$b $a" || echo "$d $c"
 	done
