@@ -1,8 +1,18 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -euo pipefail
-hash sed
-hash gtf
-hash xrandr
+
+die() {
+	printf "%s\n" "$1" 1>&2
+	exit 1
+}
+
+require() {
+	hash "$1" || die "$1: Command not found"
+}
+
+require sed
+require gtf
+require xrandr
 
 if test $# -ne 4; then
 	echo "Usage:"
