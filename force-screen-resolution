@@ -7,7 +7,7 @@ die() {
 }
 
 require() {
-	hash "$1" || die "$1: Command not found"
+	hash "$1" || exit 127
 }
 
 require sed
@@ -16,7 +16,7 @@ require xrandr
 mcmd=(cvt -r)
 
 opt=true
-case $1 in
+case ${1:-} in
 	--timing=GTF)
 		mcmd=(gtf)
 	;;
